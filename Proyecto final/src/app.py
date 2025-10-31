@@ -1,16 +1,64 @@
+from flask import Flask, render_template, request, jsonify
+from pymongo import MongoClient
+from dotenv import load_dotenv
+from pathlib import Path
+import os
 
-from flask import Flask, render_template
+# ✅ Cargar archivo cont.env desde la misma carpeta que app.py
+env_path = Path(__file__).parent / "cont.env"
+load_dotenv(dotenv_path=env_path)
 
-app= Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 
+# ✅ Leer variables de entorno
+mongo_host = os.getenv("MONGO_HOST")
+mongo_port = os.getenv("MONGO_PORT")
+mongo_user = os.getenv("MONGO_USER")
+mongo_password = os.getenv("MONGO_PASSWORD")
+mongo_db = os.getenv("MONGO_DB")
 
+# ✅ Validación básica de variables
+if not all([mongo_host, mongo_port, mongo_user, mongo_password, mongo_db]):
+    raise EnvironmentError("Faltan variables de entorno en cont.env")
+
+# ✅ Convertir puerto a entero
+mongo_port = int(mongo_port)
+
+# ✅ Construir URI de conexión
+mongo_uri = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}?authSource=admin"
+client = MongoClient(mongo_uri)
+db = client[mongo_db]
+
+# ✅ Ruta básica
 @app.route('/')
 def metodo():
-    return('Hola mundo')
+    return 'Hola mundo'
 
+# ✅ Ruta HTML básica
 @app.route('/index')
 def index():
     return render_template('index.html')
 
+# ✅ Ruta para insertar datos en MongoDB
+@app.route('/insertar', methods=['POST'])
+def insertar():
+    datos = request.json
+    resultado = db.usuarios.insert_one(datos)
+    return jsonify({"insertado_id": str(resultado.inserted_id)})
+
+# ✅ Ruta para consultar datos en JSON
+@app.route('/usuarios', methods=['GET'])
+def listar_usuarios():
+    usuarios = list(db.usuarios.find({}, {"_id": 0}))
+    return jsonify(usuarios)
+
+# ✅ Ruta para mostrar datos en tabla HTML
+@app.route('/tabla')
+def tabla():
+    usuarios = list(db.usuarios.find({}, {"_id": 0}))
+    return render_template('tabla.html', usuarios=usuarios)
+
+# ✅ Ejecutar la app en modo debug
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',port=5001, debug=True) 
+    app.run(host='0.0.0.0', port=5000, debug=True)
+
