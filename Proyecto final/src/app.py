@@ -26,7 +26,7 @@ if not all([mongo_host, mongo_port, mongo_user, mongo_password, mongo_db]):
 mongo_port = int(mongo_port)
 
 # Construir URI de conexión
-mongo_uri = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}?authSource=admin"
+# mongo_uri = f"mongodb://{mongo_user}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_db}?authSource=admin"
 mongo_uri ={mongo_uri}
 client = MongoClient(mongo_uri)
 db = client[mongo_db]
