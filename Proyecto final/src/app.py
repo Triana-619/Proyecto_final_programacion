@@ -36,6 +36,22 @@ db = client[mongo_db]
 def metodo():
     return 'Hola mundo'
 
+# Ingreso de datos de wokwi
+@app.route('/receive_sensor_data/', methods=['POST'])
+def receive_sensor_data():
+    datos = request.json
+
+    # Obtener tipo de sensor y normalizar
+    sensor_type = datos.get("sensor_type", "desconocido").lower()
+
+    # Insertar en la colección correspondiente
+    coleccion = db[sensor_type]
+    resultado = coleccion.insert_one(datos)
+
+    print(f"[OK] Dato insertado en colección '{sensor_type}' con ID: {resultado.inserted_id}")
+    return jsonify({"insertado_id": str(resultado.inserted_id)}), 201
+
+
 # Ruta HTML básica
 @app.route('/index')
 def index():
