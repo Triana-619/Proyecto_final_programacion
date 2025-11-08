@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   web:
     build:
@@ -11,6 +13,7 @@ services:
       - cont.env
     depends_on:
       - mongo
+      - influxdb
     networks:
       - app-networks
 
@@ -42,9 +45,27 @@ services:
     networks:
       - app-networks
 
+  influxdb:
+    image: influxdb:2.7
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb-storage:/var/lib/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=admin123
+      - DOCKER_INFLUXDB_INIT_ORG=auditoria
+      - DOCKER_INFLUXDB_INIT_BUCKET=sensores
+      - DOCKER_INFLUXDB_INIT_TOKEN=mi-token-seguro
+    networks:
+      - app-networks
+
 networks:
   app-networks:
     driver: bridge
 
 volumes:
   mongo-data:
+  influxdb-storage:
+
