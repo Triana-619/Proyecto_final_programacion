@@ -28,15 +28,18 @@ def home():
     return 'Servidor Flask activo y conectado a MongoDB Atlas'
 
 # Ingreso de datos desde Wokwi
+from datetime import datetime
+
 @app.route('/receive_sensor_data/', methods=['POST'])
 def receive_sensor_data():
     datos = request.json
-    # Normalizamos el nombre del sensor para evitar problemas de mayúsculas/minúsculas
     sensor_type = datos.get("sensor_type", "desconocido").strip().lower()
+    datos["sensor_type"] = sensor_type
+    datos["timestamp"] = datetime.utcnow().isoformat()  # nuevo campo
     coleccion = db[sensor_type]
     resultado = coleccion.insert_one(datos)
-    print(f"[OK] Dato insertado en colección '{sensor_type}' con ID: {resultado.inserted_id}")
     return jsonify({"insertado_id": str(resultado.inserted_id)}), 201
+
 
 # Endpoint para Grafana: consulta datos por tipo de sensor
 @app.route('/grafana_data', methods=['GET'])
