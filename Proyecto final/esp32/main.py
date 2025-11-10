@@ -8,7 +8,7 @@ import random
 WIFI_SSID = 'Wokwi-GUEST'
 WIFI_PASS = ''
 
-SERVER_URL = 'https://pa-proyecto-final-dia.onrender.com/receive_sensor_data/'
+SERVER_URL = 'https://proyecto-final-programacion-2kcc.onrender.com/receive_sensor_data/'
 
 
 def connect_wifi():
