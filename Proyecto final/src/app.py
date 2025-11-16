@@ -47,8 +47,21 @@ def grafana_data():
     sensor_type = request.args.get("sensor_type", "desconocido").strip().lower()
     if sensor_type not in db.list_collection_names():
         return jsonify({"error": f"Colección '{sensor_type}' no existe"}), 404
-    datos = list(db[sensor_type].find({}, {"_id": 0}))
-    return jsonify(datos)
+    
+    # Traer documentos
+    docs = db[sensor_type].find({}, {"_id": 0})
+    
+    # Limpiar formato para Grafana
+    clean_docs = []
+    for d in docs:
+        clean_docs.append({
+            "sensor_type": d.get("sensor_type"),
+            "value": float(d.get("value")),  # asegurar número
+            "unit": d.get("unit"),
+            "timestamp": str(d.get("timestamp"))  # asegurar string ISO
+        }) 
+    return jsonify(clean_docs)
+
 
 # Ejecutar la app
 if __name__ == '__main__':
