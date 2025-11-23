@@ -46,7 +46,7 @@ services:
 
   grafana:
     build:
-      context: ./Proyecto final/Grafana
+      context: ./Grafana
       dockerfile: dockerfile
     ports:
       - "3000:3000"
