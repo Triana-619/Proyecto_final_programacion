@@ -44,12 +44,27 @@ def receive_sensor_data():
 # Endpoint para Grafana: consulta datos por tipo de sensor
 @app.route('/grafana_data', methods=['GET'])
 def grafana_data():
-    sensor_type = request.args.get("sensor_type", "desconocido").strip().lower()
+    sensor_type = request.args.get("sensor_type", "Sound").strip()
+
+    # Asegurar que la colección existe
     if sensor_type not in db.list_collection_names():
         return jsonify({"error": f"Colección '{sensor_type}' no existe"}), 404
-    
-    # Traer documentos
+
     docs = db[sensor_type].find({}, {"_id": 0})
+    clean_docs = []
+
+    for d in docs:
+        try:
+            clean_docs.append({
+                "sensor_type": d.get("sensor_type"),
+                "value": float(d.get("voltage")) if d.get("voltage") is not None else None,
+                "unit": d.get("unit"),
+                "timestamp": str(d.get("timestamp"))
+            })
+        except Exception as e:
+            print("Error procesando documento:", e, d)
+
+    return jsonify(clean_docs)
     
     # Limpiar formato para Grafana
     clean_docs = []
