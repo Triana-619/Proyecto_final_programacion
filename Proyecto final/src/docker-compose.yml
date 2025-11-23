@@ -44,16 +44,19 @@ services:
     networks:
       - app-networks
 
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafana-storage:/var/lib/grafana
-    depends_on:
-      - mongo
-    networks:
-      - app-networks
+grafana:
+  build:
+    context: ./Proyecto final/Grafana
+    dockerfile: dockerfile
+  ports:
+    - "3000:3000"
+  volumes:
+    - grafana-storage:/var/lib/grafana
+  depends_on:
+    - mongo
+  networks:
+    - app-networks
+
 
 networks:
   app-networks:
