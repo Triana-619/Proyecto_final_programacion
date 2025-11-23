@@ -1,0 +1,10 @@
+# Dockerfile.grafana
+FROM grafana/grafana:latest
+
+# Instalar plugin específico
+RUN grafana-cli plugins install grafana-piechart-panel
+
+# (Opcional) Copiar configuración personalizada
+# COPY ./grafana/provisioning /etc/grafana/provisioning
+
+EXPOSE 3000
